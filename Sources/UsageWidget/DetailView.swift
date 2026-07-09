@@ -4,6 +4,7 @@ import UsageWidgetUI
 
 struct DetailView: View {
     @ObservedObject var model: UsageModel
+    @State private var manualKey = ""
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -29,13 +30,31 @@ struct DetailView: View {
             Divider()
 
             if model.needsLogin {
-                HStack {
-                    Text("Session expired — sign in to reconnect.")
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("Sign in to see your usage.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Button("Sign In…") { model.signIn() }
+                            .font(.caption)
+                    }
+                    // Google / SSO logins are blocked inside the embedded window,
+                    // so offer a paste-the-key fallback that works for everyone.
+                    HStack(spacing: 6) {
+                        SecureField("or paste session key", text: $manualKey)
+                            .textFieldStyle(.roundedBorder)
+                            .font(.caption)
+                        Button("Save") {
+                            model.saveManualKey(manualKey)
+                            manualKey = ""
+                        }
                         .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    Button("Sign In…") { model.signIn() }
-                        .font(.caption)
+                        .disabled(manualKey.isEmpty)
+                    }
+                    Link("Where do I find my session key?",
+                         destination: URL(string: "https://github.com/microcross/claude-usage-bar#setup")!)
+                        .font(.caption2)
                 }
             }
 

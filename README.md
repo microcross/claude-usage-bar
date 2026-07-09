@@ -45,7 +45,18 @@ The app registers itself as a login item on first launch, so it starts automatic
 
 ## Setup
 
-On first launch, if no session key is found, click the menu bar icon and hit **Sign In…** — this opens an embedded browser window pointed at `claude.ai/login`. Sign in normally; the app grabs the session cookie and stores it at `~/.claude-usage-widget/session_key` (permissions locked to your user, `chmod 600`).
+There are two ways to give the app your session, both reachable from the panel when you're not signed in.
+
+**Sign In… (email/password):** click the menu bar icon and hit **Sign In…** — this opens an embedded browser window pointed at `claude.ai/login`. Sign in and the app captures the session cookie automatically.
+
+**Paste your session key (works for Google / SSO):** if you log in to Claude with Google or another SSO provider, the embedded window can't complete that sign-in — providers block OAuth inside embedded browsers. Instead, paste your session key into the field in the panel:
+
+1. In your normal browser, sign in to [claude.ai](https://claude.ai).
+2. Open DevTools → **Application** (Chrome) or **Storage** (Safari/Firefox) → **Cookies** → `https://claude.ai`.
+3. Copy the **value** of the `sessionKey` cookie (starts with `sk-ant-sid…`). It's `HttpOnly`, so it only shows here — not via `document.cookie`.
+4. Paste it into the **"or paste session key"** field in the panel and hit **Save**.
+
+Either way the key is stored at `~/.claude-usage-widget/session_key`, with permissions locked to your user (`chmod 600`).
 
 ## Privacy
 

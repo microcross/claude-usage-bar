@@ -30,6 +30,18 @@ final class UsageModel: ObservableObject {
         }
     }
 
+    // Manual fallback for SSO/Google users, whose provider blocks OAuth inside
+    // the embedded login window. They paste the sessionKey cookie value copied
+    // from their browser's DevTools.
+    func saveManualKey(_ raw: String) {
+        let key = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !key.isEmpty else { return }
+        SessionKeyStore.write(key)
+        needsLogin = false
+        orgID = nil
+        refresh()
+    }
+
     func start() {
         refresh()
         timer?.invalidate()
