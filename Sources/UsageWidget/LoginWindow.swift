@@ -38,7 +38,8 @@ final class LoginWindow: NSObject, NSWindowDelegate {
         NSApp.activate(ignoringOtherApps: true)
 
         pollTimer = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: true) { [weak self] _ in
-            Task { @MainActor in self?.checkForSessionKey() }
+            guard let self else { return }
+            Task { @MainActor in self.checkForSessionKey() }
         }
     }
 

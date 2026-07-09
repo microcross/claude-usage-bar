@@ -37,7 +37,8 @@ final class UsageModel: ObservableObject {
         refresh()
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { [weak self] _ in
-            Task { @MainActor in self?.refresh() }
+            guard let self else { return }
+            Task { @MainActor in self.refresh() }
         }
     }
 
