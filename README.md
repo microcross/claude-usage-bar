@@ -25,7 +25,7 @@ There's no public API for the Claude.ai subscription usage panel (this is differ
 2. It loads `claude.ai/api/organizations/.../usage` inside an embedded, invisible `WKWebView` — a real WebKit engine, which is what gets past Cloudflare's bot check (plain HTTP requests get blocked).
 3. It parses the JSON response and renders it.
 
-If the session key expires, the app shows a "Sign In…" button that opens an embedded login window; once you sign in, it captures the renewed cookie itself.
+If the session key expires, the panel prompts you to paste a fresh one (see [Setup](#setup)).
 
 ## Requirements
 
@@ -45,18 +45,14 @@ The app registers itself as a login item on first launch, so it starts automatic
 
 ## Setup
 
-There are two ways to give the app your session, both reachable from the panel when you're not signed in.
-
-**Sign In… (email/password):** click the menu bar icon and hit **Sign In…** — this opens an embedded browser window pointed at `claude.ai/login`. Sign in and the app captures the session cookie automatically.
-
-**Paste your session key (works for Google / SSO):** if you log in to Claude with Google or another SSO provider, the embedded window can't complete that sign-in — providers block OAuth inside embedded browsers. Instead, paste your session key into the field in the panel:
+Connect the app by pasting your Claude session key:
 
 1. In your normal browser, sign in to [claude.ai](https://claude.ai).
 2. Open DevTools → **Application** (Chrome) or **Storage** (Safari/Firefox) → **Cookies** → `https://claude.ai`.
 3. Copy the **value** of the `sessionKey` cookie (starts with `sk-ant-sid…`). It's `HttpOnly`, so it only shows here — not via `document.cookie`.
-4. Paste it into the **"or paste session key"** field in the panel and hit **Save**.
+4. Click the menu bar icon, paste it into the **session key** field, and hit **Save**.
 
-Either way the key is stored at `~/.claude-usage-widget/session_key`, with permissions locked to your user (`chmod 600`).
+The key is stored at `~/.claude-usage-widget/session_key`, with permissions locked to your user (`chmod 600`). This works no matter how you log in to Claude (email/password, Google, or other SSO).
 
 ## Privacy
 

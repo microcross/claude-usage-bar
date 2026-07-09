@@ -16,23 +16,10 @@ final class UsageModel: ObservableObject {
     private var timer: Timer?
     private var isLoading = false
     private lazy var fetcher = WebUsageFetcher()
-    private let loginWindow = LoginWindow()
 
-    func signIn() {
-        loginWindow.show { [weak self] key in
-            guard let self else { return }
-            if let key {
-                SessionKeyStore.write(key)
-                self.needsLogin = false
-                self.orgID = nil
-                self.refresh()
-            }
-        }
-    }
-
-    // Manual fallback for SSO/Google users, whose provider blocks OAuth inside
-    // the embedded login window. They paste the sessionKey cookie value copied
-    // from their browser's DevTools.
+    // Connect by pasting the sessionKey cookie value copied from the browser's
+    // DevTools. (An embedded login window can't be used because Google/SSO
+    // providers block OAuth inside embedded WebViews.)
     func saveManualKey(_ raw: String) {
         let key = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !key.isEmpty else { return }

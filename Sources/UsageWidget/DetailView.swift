@@ -31,18 +31,11 @@ struct DetailView: View {
 
             if model.needsLogin {
                 VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text("Sign in to see your usage.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Button("Sign In…") { model.signIn() }
-                            .font(.caption)
-                    }
-                    // Google / SSO logins are blocked inside the embedded window,
-                    // so offer a paste-the-key fallback that works for everyone.
+                    Text("Paste your Claude session key to connect.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                     HStack(spacing: 6) {
-                        SecureField("or paste session key", text: $manualKey)
+                        SecureField("session key", text: $manualKey)
                             .textFieldStyle(.roundedBorder)
                             .font(.caption)
                         Button("Save") {
