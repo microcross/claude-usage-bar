@@ -48,6 +48,14 @@ On first launch, if no session key is found, click the menu bar icon and hit **S
 
 Your session key never leaves your machine — it's used only to talk directly to `claude.ai` from your own Mac, stored locally, and read by nothing else.
 
+## Development
+
+The pure logic (usage-response parsing, org selection) lives in the `UsageWidgetCore` library and the AppKit/SwiftUI pieces in `UsageWidgetUI`, both covered by an XCTest suite:
+
+```bash
+swift test
+```
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
