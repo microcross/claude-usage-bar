@@ -1,10 +1,7 @@
 import Foundation
 import Combine
-
-struct UsageWindow {
-    var utilizationPct: Double // 0...100
-    var resetsAt: Date?
-}
+import UsageWidgetCore
+import UsageWidgetUI
 
 @MainActor
 final class UsageModel: ObservableObject {
@@ -78,9 +75,9 @@ final class UsageModel: ObservableObject {
 
     // Both endpoints return {"type": "error", ...} bodies for auth problems.
     private func checkForAPIError(_ json: [String: Any]) throws {
-        guard json["type"] as? String == "error" else { return }
-        let message = (json["error"] as? [String: Any])?["message"] as? String ?? "Session expired."
-        throw UsageError.auth(message)
+        if let message = UsageParser.apiErrorMessage(in: json) {
+            throw UsageError.auth(message)
+        }
     }
 
     private func resolveOrgID(sessionKey: String) async throws -> String {
@@ -93,10 +90,7 @@ final class UsageModel: ObservableObject {
         guard let arr = try JSONSerialization.jsonObject(with: data) as? [[String: Any]] else {
             throw UsageError.parse("Could not find an organization id in response")
         }
-        // Accounts can have multiple orgs (e.g. an API-only org alongside the
-        // claude.ai chat/Pro org). Usage limits only apply to the chat org.
-        let chatOrg = arr.first { ($0["capabilities"] as? [String])?.contains("chat") == true }
-        guard let uuid = (chatOrg ?? arr.first)?["uuid"] as? String else {
+        guard let uuid = UsageParser.selectChatOrgUUID(from: arr) else {
             throw UsageError.parse("Could not find an organization id in response")
         }
         orgID = uuid
@@ -114,23 +108,9 @@ final class UsageModel: ObservableObject {
     }
 
     private func apply(_ json: [String: Any]) {
-        session = window(from: json["five_hour"])
-        weekly = window(from: json["seven_day"])
-        weeklyOpus = window(from: json["seven_day_opus"])
-    }
-
-    private func window(from raw: Any?) -> UsageWindow? {
-        guard let dict = raw as? [String: Any] else { return nil }
-        let pct = (dict["utilization"] as? NSNumber)?.doubleValue
-            ?? (dict["utilization"] as? Double)
-            ?? 0
-        var reset: Date?
-        if let s = dict["resets_at"] as? String {
-            let formatter = ISO8601DateFormatter()
-            formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-            reset = formatter.date(from: s) ?? ISO8601DateFormatter().date(from: s)
-        }
-        return UsageWindow(utilizationPct: pct, resetsAt: reset)
+        session = UsageParser.parseWindow(from: json["five_hour"] as? [String: Any])
+        weekly = UsageParser.parseWindow(from: json["seven_day"] as? [String: Any])
+        weeklyOpus = UsageParser.parseWindow(from: json["seven_day_opus"] as? [String: Any])
     }
 }
 

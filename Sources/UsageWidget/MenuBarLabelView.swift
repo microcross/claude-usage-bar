@@ -1,4 +1,5 @@
 import SwiftUI
+import UsageWidgetUI
 
 // Two template-image donut rings: session (left) and weekly (right).
 // Rendered via Core Graphics because SwiftUI Shapes don't survive

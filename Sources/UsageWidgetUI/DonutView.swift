@@ -1,14 +1,21 @@
 import SwiftUI
 
-struct DonutView: View {
+public struct DonutView: View {
     let percent: Double // 0...100
     var lineWidth: CGFloat = 5
     var showLabel: Bool = true
     var color: Color = .accentColor
 
+    public init(percent: Double, lineWidth: CGFloat = 5, showLabel: Bool = true, color: Color = .accentColor) {
+        self.percent = percent
+        self.lineWidth = lineWidth
+        self.showLabel = showLabel
+        self.color = color
+    }
+
     private var clamped: Double { min(max(percent, 0), 100) }
 
-    var body: some View {
+    public var body: some View {
         ZStack {
             Circle()
                 .stroke(Color.primary.opacity(0.35), lineWidth: lineWidth)
@@ -26,7 +33,7 @@ struct DonutView: View {
 }
 
 extension DonutView {
-    static func color(for percent: Double) -> Color {
+    public static func color(for percent: Double) -> Color {
         switch percent {
         case ..<50: return .green
         case ..<80: return .yellow

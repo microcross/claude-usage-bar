@@ -5,8 +5,8 @@ import AppKit
 // into an NSImage with Core Graphics and marking it isTemplate is the same
 // path native status icons use, so it renders reliably and adapts to
 // light/dark menu bars.
-enum MenuBarIcon {
-    static func image(session: Double?, weekly: Double?) -> NSImage {
+public enum MenuBarIcon {
+    public static func image(session: Double?, weekly: Double?) -> NSImage {
         let height: CGFloat = 18
         let ringDiameter: CGFloat = 16
         let spacing: CGFloat = 5
