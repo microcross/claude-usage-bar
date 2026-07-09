@@ -27,9 +27,12 @@ There's no public API for the Claude.ai subscription usage panel (this is differ
 
 If the session key expires, the app shows a "Sign In…" button that opens an embedded login window; once you sign in, it captures the renewed cookie itself.
 
-## Install
+## Requirements
 
-Requires macOS 13+ and the Swift toolchain (ships with Xcode / Xcode Command Line Tools).
+- **macOS 13 (Ventura) or later** — the app uses `MenuBarExtra` and `SMAppService`, both macOS 13 APIs. (Built and tested on macOS 14–15.)
+- The Swift toolchain, which ships with Xcode or the Xcode Command Line Tools (`xcode-select --install`).
+
+## Install
 
 ```bash
 git clone https://github.com/microcross/claude-usage-bar.git
