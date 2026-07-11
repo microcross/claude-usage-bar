@@ -7,15 +7,22 @@ A tiny native macOS menu bar app that shows your Claude.ai usage as two donut ri
 [![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-lightgrey)](https://www.apple.com/macos/)
 [![Swift](https://img.shields.io/badge/Swift-5.9-orange.svg)](https://swift.org)
 
+> **Unofficial.** This is a personal project, not affiliated with, endorsed by, or supported by Anthropic. It relies on an undocumented `claude.ai` endpoint that can change or break at any time. Use at your own risk. "Claude" is a trademark of Anthropic, used here only to describe what the tool does.
+
 ## Why
 
 The Claude desktop app buries usage under Settings → Usage. This puts it one glance away, always visible in the menu bar.
 
 ## What it looks like
 
+<p>
+  <img src="docs/screenshot.png" width="320" alt="Panel showing healthy usage with green rings">
+  <img src="docs/screenshot-limit.png" width="320" alt="Panel showing near-limit usage with red and yellow rings">
+</p>
+
 Menu bar: two small rings, `S` (session) and `W` (weekly), filling clockwise as you use up your limit.
 
-Click it for a panel with full donuts, reset times, and a bar-chart breakdown (session, 7-day all models, 7-day Opus).
+Click it for a panel with full donuts, reset times, and a bar-chart breakdown (session, 7-day all models, 7-day Opus). The rings and bars go green → yellow → red as you approach a limit.
 
 ## How it works
 
@@ -56,7 +63,15 @@ The key is stored at `~/.claude-usage-widget/session_key`, with permissions lock
 
 ## Privacy
 
-Your session key never leaves your machine — it's used only to talk directly to `claude.ai` from your own Mac, stored locally, and read by nothing else.
+Your session key never leaves your machine — it's used only to talk directly to `claude.ai` from your own Mac, and read by nothing else. There are no analytics, no telemetry, and no third-party servers involved.
+
+Be aware the key is stored in **plaintext** at `~/.claude-usage-widget/session_key` (file permissions `0600`, so only your user account can read it), not in the macOS Keychain. It's a powerful credential — anyone who can read that file can act as you on claude.ai — so treat it like a password. Moving storage to the Keychain is a planned hardening improvement.
+
+## Limitations
+
+- Uses an **undocumented** `claude.ai` endpoint; Anthropic may change or remove it, which would break the app until it's updated.
+- Only tested against **Pro/Max** subscription accounts. Free-tier accounts are untested and the usage response may differ.
+- The `.app` is **ad-hoc signed**, so it's meant to be built from source (below). A downloaded prebuilt copy would be blocked by Gatekeeper.
 
 ## Development
 
