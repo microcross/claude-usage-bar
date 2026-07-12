@@ -16,10 +16,6 @@ The Claude desktop app buries usage under Settings → Usage. This puts it one g
 ## What it looks like
 
 <p>
-  <img src="docs/demo.gif" width="320" alt="Animated demo: rings filling up from empty to near-limit, then the panel opening">
-  <br><sub><em>Sped-up mockup for illustration — real usage fills over hours/days, not seconds.</em></sub>
-</p>
-<p>
   <img src="docs/screenshot.png" width="320" alt="Panel showing healthy usage with green rings">
   <img src="docs/screenshot-limit.png" width="320" alt="Panel showing near-limit usage with red and yellow rings">
 </p>
