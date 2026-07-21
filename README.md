@@ -22,7 +22,9 @@ The Claude desktop app buries usage under Settings → Usage. This puts it one g
 
 Menu bar: two small rings, `S` (session) and `W` (weekly), filling clockwise as you use up your limit.
 
-Click it for a panel with full donuts, reset times, and a bar-chart breakdown (session, 7-day all models, 7-day Opus). The rings and bars go green → yellow → red as you approach a limit.
+Left-click for a frosted panel where each metric gets its own card: a gradient donut, and the reset time right underneath ("3h 12m" within a day, "Thu 7 PM" beyond). The donuts go green → yellow → red as you approach a limit.
+
+Right-click the rings for quick actions: **Refresh**, **Log Out** (or **Sign In…** when disconnected), and **Quit**.
 
 ## How it works
 

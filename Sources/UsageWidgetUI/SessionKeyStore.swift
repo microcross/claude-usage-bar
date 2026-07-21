@@ -22,4 +22,8 @@ public enum SessionKeyStore {
         try? key.write(to: url, atomically: true, encoding: .utf8)
         try? FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: url.path)
     }
+
+    public static func delete(at url: URL = fileURL) {
+        try? FileManager.default.removeItem(at: url)
+    }
 }
