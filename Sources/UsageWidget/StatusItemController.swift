@@ -63,9 +63,22 @@ final class StatusItemController: NSObject {
     // synthesize that click, then clear it to keep left-click on the popover.
     private func showContextMenu() {
         let menu = NSMenu()
+
         let refresh = NSMenuItem(title: "Refresh", action: #selector(refreshAction), keyEquivalent: "r")
         refresh.target = self
         menu.addItem(refresh)
+
+        if model.needsLogin {
+            // Sign-in is pasting the session key, which lives in the panel.
+            let signIn = NSMenuItem(title: "Sign In…", action: #selector(signInAction), keyEquivalent: "")
+            signIn.target = self
+            menu.addItem(signIn)
+        } else {
+            let logOut = NSMenuItem(title: "Log Out", action: #selector(logOutAction), keyEquivalent: "")
+            logOut.target = self
+            menu.addItem(logOut)
+        }
+
         menu.addItem(.separator())
         let quit = NSMenuItem(title: "Quit UsageWidget", action: #selector(quitAction), keyEquivalent: "q")
         quit.target = self
@@ -77,5 +90,9 @@ final class StatusItemController: NSObject {
     }
 
     @objc private func refreshAction() { model.refresh() }
+    @objc private func signInAction() {
+        if !popover.isShown { togglePopover() }
+    }
+    @objc private func logOutAction() { model.logOut() }
     @objc private func quitAction() { NSApplication.shared.terminate(nil) }
 }

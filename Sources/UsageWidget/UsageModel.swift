@@ -17,6 +17,17 @@ final class UsageModel: ObservableObject {
     private var isLoading = false
     private lazy var fetcher = WebUsageFetcher()
 
+    func logOut() {
+        SessionKeyStore.delete()
+        session = nil
+        weekly = nil
+        weeklyOpus = nil
+        lastUpdated = nil
+        orgID = nil
+        needsLogin = true
+        errorMessage = "Not signed in."
+    }
+
     // Connect by pasting the sessionKey cookie value copied from the browser's
     // DevTools. (An embedded login window can't be used because Google/SSO
     // providers block OAuth inside embedded WebViews.)
