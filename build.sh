@@ -4,7 +4,7 @@ cd "$(dirname "$0")"
 
 APP="UsageWidget.app"
 BUNDLE_ID="com.local.usagewidget"
-VERSION="1.0"
+VERSION="1.1.0"
 
 swift build -c release
 
