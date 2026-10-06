@@ -11,11 +11,14 @@ final class UsageModel: ObservableObject {
     @Published var lastUpdated: Date?
     @Published var errorMessage: String?
     @Published var needsLogin = false
+    @Published var updateAvailable: String?
 
     private var orgID: String?
     private var timer: Timer?
+    private var updateTimer: Timer?
     private var isLoading = false
     private lazy var fetcher = WebUsageFetcher()
+    private let updateChecker = UpdateChecker()
 
     func logOut() {
         SessionKeyStore.delete()
@@ -47,10 +50,30 @@ final class UsageModel: ObservableObject {
             guard let self else { return }
             Task { @MainActor in self.refresh() }
         }
+
+        checkForUpdate()
+        updateTimer?.invalidate()
+        updateTimer = Timer.scheduledTimer(withTimeInterval: 24 * 3600, repeats: true) { [weak self] _ in
+            guard let self else { return }
+            Task { @MainActor in self.checkForUpdate() }
+        }
     }
 
     func refresh() {
         Task { await load() }
+    }
+
+    // Once per launch and once a day after that; a stale "update available"
+    // notice for days isn't useful, but there's no need to hammer the GitHub
+    // API either.
+    private func checkForUpdate() {
+        Task {
+            guard let latest = await updateChecker.latestVersion() else { return }
+            let current = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0"
+            if VersionCompare.isNewer(latest, than: current) {
+                updateAvailable = latest
+            }
+        }
     }
 
     private func load() async {

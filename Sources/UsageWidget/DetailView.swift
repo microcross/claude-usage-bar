@@ -44,6 +44,16 @@ struct DetailView: View {
                 }
             }
 
+            if let latest = model.updateAvailable {
+                Link(destination: URL(string: "https://github.com/microcross/claude-usage-bar/tags")!) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.down.circle")
+                        Text("Update available: \(latest)")
+                    }
+                    .font(.caption2)
+                }
+            }
+
             Divider()
 
             HStack {
