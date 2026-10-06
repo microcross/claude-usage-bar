@@ -55,7 +55,7 @@ final class UsageModel: ObservableObject {
 
     private func load() async {
         guard !isLoading else { return }
-        guard let key = SessionKeyStore.read() else {
+        guard let storedKey = SessionKeyStore.read() else {
             needsLogin = true
             errorMessage = "Not signed in."
             return
@@ -63,16 +63,23 @@ final class UsageModel: ObservableObject {
         isLoading = true
         defer { isLoading = false }
         do {
+            // claude.ai occasionally rotates the session cookie mid-flow. Each
+            // fetchJSON call pins the WKWebView's cookie to whatever key we pass
+            // it, so re-using the on-disk key for the second request would
+            // clobber a rotation picked up during the first and fail auth with
+            // a stale key. Re-read the live cookie after every request and
+            // thread it forward instead.
+            var key = storedKey
             let org = try await resolveOrgID(sessionKey: key)
+            key = await fetcher.currentSessionKey() ?? key
             let usage = try await fetchUsage(orgID: org, sessionKey: key)
+            key = await fetcher.currentSessionKey() ?? key
             apply(usage)
             errorMessage = nil
             needsLogin = false
             lastUpdated = Date()
-            // claude.ai occasionally rotates the session cookie; persist the
-            // live one so the on-disk key doesn't go stale.
-            if let liveKey = await fetcher.currentSessionKey(), liveKey != key {
-                SessionKeyStore.write(liveKey)
+            if key != storedKey {
+                SessionKeyStore.write(key)
             }
         } catch UsageError.auth(let msg) {
             needsLogin = true

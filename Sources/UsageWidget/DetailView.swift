@@ -44,7 +44,7 @@ struct DetailView: View {
             Divider()
 
             HStack {
-                if let error = model.errorMessage, !model.needsLogin {
+                if let error = model.errorMessage {
                     Text(error)
                         .font(.caption2)
                         .foregroundStyle(.red)
