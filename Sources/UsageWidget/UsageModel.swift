@@ -62,31 +62,48 @@ final class UsageModel: ObservableObject {
         }
         isLoading = true
         defer { isLoading = false }
-        do {
-            // claude.ai occasionally rotates the session cookie mid-flow. Each
-            // fetchJSON call pins the WKWebView's cookie to whatever key we pass
-            // it, so re-using the on-disk key for the second request would
-            // clobber a rotation picked up during the first and fail auth with
-            // a stale key. Re-read the live cookie after every request and
-            // thread it forward instead.
-            var key = storedKey
-            let org = try await resolveOrgID(sessionKey: key)
-            key = await fetcher.currentSessionKey() ?? key
-            let usage = try await fetchUsage(orgID: org, sessionKey: key)
-            key = await fetcher.currentSessionKey() ?? key
-            apply(usage)
-            errorMessage = nil
-            needsLogin = false
-            lastUpdated = Date()
-            if key != storedKey {
-                SessionKeyStore.write(key)
+
+        // A fresh paste can race claude.ai rotating the cookie (or just hit a
+        // slow first pass through Cloudflare's challenge), so an auth failure
+        // gets one immediate retry using whatever key is actually live in the
+        // WKWebView's cookie jar — which may differ from what's on disk —
+        // before we surface it as a real failure.
+        for attempt in 0..<2 {
+            let key = attempt == 0 ? storedKey : (await fetcher.currentSessionKey() ?? storedKey)
+            do {
+                try await attemptLoad(key: key)
+                return
+            } catch UsageError.auth(let msg) {
+                orgID = nil
+                if attempt == 0 { continue }
+                needsLogin = true
+                errorMessage = msg
+            } catch {
+                errorMessage = "\(error.localizedDescription)"
+                FileHandle.standardError.write("UsageWidget error: \(error)\n".data(using: .utf8)!)
+                return
             }
-        } catch UsageError.auth(let msg) {
-            needsLogin = true
-            errorMessage = msg
-        } catch {
-            errorMessage = "\(error.localizedDescription)"
-            FileHandle.standardError.write("UsageWidget error: \(error)\n".data(using: .utf8)!)
+        }
+    }
+
+    // claude.ai occasionally rotates the session cookie mid-flow. Each
+    // fetchJSON call pins the WKWebView's cookie to whatever key we pass it,
+    // so re-using the on-disk key for the second request would clobber a
+    // rotation picked up during the first and fail auth with a stale key.
+    // Re-read the live cookie after every request and thread it forward
+    // instead.
+    private func attemptLoad(key initialKey: String) async throws {
+        var key = initialKey
+        let org = try await resolveOrgID(sessionKey: key)
+        key = await fetcher.currentSessionKey() ?? key
+        let usage = try await fetchUsage(orgID: org, sessionKey: key)
+        key = await fetcher.currentSessionKey() ?? key
+        apply(usage)
+        errorMessage = nil
+        needsLogin = false
+        lastUpdated = Date()
+        if key != SessionKeyStore.read() {
+            SessionKeyStore.write(key)
         }
     }
 
