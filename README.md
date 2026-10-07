@@ -7,7 +7,7 @@ A tiny native macOS menu bar app that shows your Claude.ai usage as two donut ri
 [![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-lightgrey)](https://www.apple.com/macos/)
 [![Swift](https://img.shields.io/badge/Swift-5.9-orange.svg)](https://swift.org)
 
-> **Unofficial.** This is a personal project, not affiliated with, endorsed by, or supported by Anthropic. It relies on an undocumented `claude.ai` endpoint that can change or break at any time. Use at your own risk. "Claude" is a trademark of Anthropic, used here only to describe what the tool does.
+> **Unofficial, unsupported, and against Anthropic's terms.** This is a personal project, not affiliated with, endorsed by, or supported by Anthropic. It relies on an undocumented `claude.ai` endpoint that can change or break at any time. As of February 2026, Anthropic's terms explicitly prohibit third-party tools from using a Free/Pro/Max/Team/Enterprise session outside claude.ai or Claude Code itself — which is exactly what this app does — and reports suggest enforcement (rejecting session cookies used from an unrecognized client) is already rolling out. It may stop working permanently, and using it could carry risk to your account. Use at your own risk. "Claude" is a trademark of Anthropic, used here only to describe what the tool does.
 
 ## Why
 
@@ -34,6 +34,8 @@ There's no public API for the Claude.ai subscription usage panel (this is differ
 3. It parses the JSON response and renders it.
 
 If the session key expires, the panel prompts you to paste a fresh one (see [Setup](#setup)).
+
+**Known issue:** some users are now seeing "invalid session key" even with a freshly-copied, genuinely valid cookie. The most likely cause is the Anthropic terms change above — not a bug in this app — since the technique depends on a session created in your real browser still being accepted when replayed from a different client (the embedded `WKWebView`). There's currently no known fix for this on our end.
 
 ## Requirements
 
