@@ -38,13 +38,26 @@ struct DetailView: View {
                     Link("Where do I find my session key?",
                          destination: URL(string: "https://github.com/microcross/claude-usage-bar#setup")!)
                         .font(.caption2)
+                    Text("Unofficial and unsupported: this reuses your claude.ai session outside the browser, which Anthropic's terms don't permit for third-party tools. It may stop working, be rejected, or affect your account at any time.")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            if let latest = model.updateAvailable {
+                Link(destination: URL(string: "https://github.com/microcross/claude-usage-bar/tags")!) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.down.circle")
+                        Text("Update available: \(latest)")
+                    }
+                    .font(.caption2)
                 }
             }
 
             Divider()
 
             HStack {
-                if let error = model.errorMessage, !model.needsLogin {
+                if let error = model.errorMessage {
                     Text(error)
                         .font(.caption2)
                         .foregroundStyle(.red)

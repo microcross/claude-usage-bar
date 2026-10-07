@@ -42,6 +42,13 @@ final class WebUsageFetcher: NSObject, WKNavigationDelegate {
     }
 
     private func setCookie(sessionKey: String) async throws {
+        let store = webView.configuration.websiteDataStore.httpCookieStore
+        // Clear any previously-set sessionKey first so a stale cookie object
+        // (e.g. left over with different attributes from an earlier key)
+        // can't coexist with the new one and win out ambiguously.
+        for cookie in await store.allCookies() where cookie.name == "sessionKey" {
+            await store.deleteCookie(cookie)
+        }
         let props: [HTTPCookiePropertyKey: Any] = [
             .domain: ".claude.ai",
             .path: "/",
@@ -50,7 +57,7 @@ final class WebUsageFetcher: NSObject, WKNavigationDelegate {
             .secure: true
         ]
         guard let cookie = HTTPCookie(properties: props) else { return }
-        await webView.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
+        await store.setCookie(cookie)
     }
 
     private func load(url: URL) async throws {
